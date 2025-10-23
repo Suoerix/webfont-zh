@@ -1,0 +1,21 @@
+{
+    "id": "plangothic",
+    "version": "2.9.5787",
+    "font_family": "Plangothic",
+    "fallback": [
+        "WenJinMincho"
+    ],
+    "license": "SIL Open Font License 1.1",
+    "files": [
+        {
+            "name": "Plangothic P1",
+            "path": "Plangothic P1.ttf",
+            "font_family": "Plangothic P1"
+        },
+        {
+            "name": "Plangothic P2",
+            "path": "Plangothic P2.ttf",
+            "font_family": "Plangothic P2"
+        }
+    ]
+}

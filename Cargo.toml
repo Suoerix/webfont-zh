@@ -1,0 +1,45 @@
+[package]
+name = "webfont-zh"
+version = "0.1.0"
+edition = "2021"
+authors = ["PexEric <suoerix@gmail.com>"]
+description = "中文维基百科生僻字webfont服务"
+license = "Apache-2.0"
+
+[dependencies]
+# Web框架
+tokio = { version = "1.0", features = ["full"] }
+axum = { version = "0.7", features = ["macros"] }
+tower = "0.4"
+tower-http = { version = "0.5", features = ["fs", "cors"] }
+
+# 序列化
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# 字体处理
+harfbuzz_rs_now = "2.3.2"
+ttf-parser = "0.24"
+woff = "0.6.2"
+
+# 工具库
+anyhow = "1.0"
+thiserror = "1.0"
+log = "0.4"
+env_logger = "0.11"
+uuid = { version = "1.0", features = ["v4"] }
+md5 = "0.7"
+
+# 文件系统和路径
+walkdir = "2.0"
+regex = "1.0"
+
+# 异步和并发
+rayon = "1.0"
+futures = "0.3"
+
+# HTTP客户端（用于字体更新）
+reqwest = { version = "0.11", features = ["json"] }
+
+[dev-dependencies]
+tempfile = "3.0"

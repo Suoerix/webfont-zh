@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebFont-ZH 测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            line-height: 1.6;
+        }
+
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .char-test {
+            font-size: 48px;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+
+        /* 使用webfont服务的字体 */
+        @font-face {
+            font-family: "Plangothic-20013";
+            src: url("http://localhost:3000/static/plangothic/20013.woff2") format("woff2"),
+                url("http://localhost:3000/api/v1/font?id=plangothic&char=20013") format("woff2");
+            unicode-range: U+4E2D;
+        }
+
+        @font-face {
+            font-family: "Plangothic-171907";
+            src: url("http://localhost:3000/static/plangothic/171907.woff2") format("woff2"),
+                url("http://localhost:3000/api/v1/font?id=plangothic&char=171907") format("woff2");
+            unicode-range: U+29F83;
+        }
+
+        .webfont-test {
+            font-family: "Plangothic-20013", "Plangothic-171907", serif;
+        }
+
+        .info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        .code {
+            font-family: monospace;
+            background: #f0f0f0;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>WebFont-ZH 测试页面</h1>
+
+    <div class="info">
+        <strong>说明：</strong>这个页面测试webfont-zh服务的字体加载功能。
+        页面会从本地服务器加载特定字符的字体文件。
+    </div>
+
+    <div class="test-section">
+        <h2>基本汉字测试</h2>
+        <div class="info">
+            测试字符：中 (U+4E2D, 十进制: 20013)
+        </div>
+        <div class="char-test webfont-test">中</div>
+        <div>默认字体显示：<span style="font-size: 48px;">中</span></div>
+    </div>
+
+    <div class="test-section">
+        <h2>生僻字测试</h2>
+        <div class="info">
+            测试字符：𩾃 (U+29F83, 十进制: 171907) - 这是一个生僻的鱼字旁汉字
+        </div>
+        <div class="char-test webfont-test">𩾃</div>
+        <div>默认字体显示：<span style="font-size: 48px;">𩾃</span></div>
+    </div>
+
+    <div class="test-section">
+        <h2>API测试链接</h2>
+        <ul>
+            <li><a href="http://localhost:3000/api/v1/list" target="_blank">获取字体列表</a></li>
+            <li><a href="http://localhost:3000/api/v1/font?id=plangothic&char=20013" target="_blank">获取"中"字字体</a></li>
+            <li><a href="http://localhost:3000/api/v1/font?id=plangothic&char=171907" target="_blank">获取"𩾃"字字体</a></li>
+            <li><a href="http://localhost:3000/static/plangothic/20013.woff2" target="_blank">静态缓存文件</a></li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>缓存测试</h2>
+        <p>多次刷新页面，观察网络请求。第一次会从API获取，后续应该使用静态缓存。</p>
+        <div class="info">
+            <strong>缓存策略：</strong>
+            <br>• 单字符：<code>/static/字体id/unicode码点.woff2</code>
+            <br>• 多字符：<code>/static/字体id/cache/码点1,码点2,码点3.woff2</code>
+            <br>• HTTP缓存：<code>Cache-Control: public, max-age=31536000, immutable</code>
+        </div>
+    </div>
+
+    <script>
+        // 检查字体加载状态
+        document.fonts.ready.then(function () {
+            console.log('所有字体已加载完成');
+
+            // 检查特定字体是否加载
+            const fonts = ['Plangothic-20013', 'Plangothic-171907'];
+            fonts.forEach(fontFamily => {
+                if (document.fonts.check('48px ' + fontFamily)) {
+                    console.log(`字体 ${fontFamily} 加载成功`);
+                } else {
+                    console.log(`字体 ${fontFamily} 加载失败`);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

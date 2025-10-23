@@ -1,0 +1,26 @@
+{
+    "id": "WenJinMincho",
+    "version": "2.001",
+    "font_family": "WenJinMincho",
+    "fallback": [
+        "plangothic"
+    ],
+    "license": "SIL Open Font License 1.1",
+    "files": [
+        {
+            "name": "WenJinMincho P0",
+            "path": "WenJinMinchoP0-Regular.ttf",
+            "font_family": "WenJin Mincho Plane 0"
+        },
+        {
+            "name": "WenJinMincho P1",
+            "path": "WenJinMinchoP1-Regular.ttf",
+            "font_family": "WenJin Mincho Plane 1"
+        },
+        {
+            "name": "WenJinMincho P2",
+            "path": "WenJinMinchoP2-Regular.ttf",
+            "font_family": "WenJin Mincho Plane 2"
+        }
+    ]
+}
