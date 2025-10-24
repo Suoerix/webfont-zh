@@ -37,9 +37,21 @@ pub struct FontConfig {
     pub id: String,
     pub version: String,
     pub font_family: String,
+    #[serde(default)]
+    pub name: Option<LocalizedText>,
+    #[serde(default)]
+    pub title: Option<LocalizedText>,
     pub fallback: Vec<String>,
     pub license: String,
     pub files: Vec<FontFile>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LocalizedText {
+    #[serde(rename = "zh-hans")]
+    pub zh_hans: String,
+    #[serde(rename = "zh-hant")]
+    pub zh_hant: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

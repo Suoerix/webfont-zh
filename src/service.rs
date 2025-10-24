@@ -21,6 +21,10 @@ pub struct FontInfo {
     pub font_family: String,
     pub license: String,
     pub fallback: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<crate::config::LocalizedText>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub title: Option<crate::config::LocalizedText>,
 }
 
 pub struct FontService {
@@ -97,6 +101,8 @@ impl FontService {
                 font_family: config.font_family.clone(),
                 license: config.license.clone(),
                 fallback: config.fallback.clone(),
+                name: config.name.clone(),
+                title: config.title.clone(),
             })
             .collect()
     }

@@ -2,6 +2,14 @@
     "id": "WenJinMincho",
     "version": "2.001",
     "font_family": "WenJinMincho",
+    "name": {
+        "zh-hans": "文津宋体",
+        "zh-hant": "文津明朝"
+    },
+    "title": {
+        "zh-hans": "[https://github.com/takushun-wu/WenJinMincho 文津宋体]",
+        "zh-hant": "[https://github.com/takushun-wu/WenJinMincho 文津明朝]"
+    },
     "fallback": [
         "plangothic"
     ],

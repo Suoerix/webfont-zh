@@ -2,6 +2,14 @@
     "id": "plangothic",
     "version": "2.9.5787",
     "font_family": "Plangothic",
+    "name": {
+        "zh-hans": "遍黑体",
+        "zh-hant": "遍黑體"
+    },
+    "title": {
+        "zh-hans": "[[遍黑體|遍黑体]]",
+        "zh-hant": "[[遍黑體]]"
+    },
     "fallback": [
         "WenJinMincho"
     ],
