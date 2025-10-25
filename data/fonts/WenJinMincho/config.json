@@ -11,7 +11,7 @@
         "zh-hant": "[https://github.com/takushun-wu/WenJinMincho 文津明朝]"
     },
     "fallback": [
-        "plangothic"
+        "Plangothic"
     ],
     "license": "SIL Open Font License 1.1",
     "files": [
@@ -21,14 +21,14 @@
             "font_family": "WenJin Mincho Plane 0"
         },
         {
-            "name": "WenJinMincho P1",
-            "path": "WenJinMinchoP1-Regular.ttf",
-            "font_family": "WenJin Mincho Plane 1"
-        },
-        {
             "name": "WenJinMincho P2",
             "path": "WenJinMinchoP2-Regular.ttf",
             "font_family": "WenJin Mincho Plane 2"
+        },
+        {
+            "name": "WenJinMincho P3",
+            "path": "WenJinMinchoP3-Regular.ttf",
+            "font_family": "WenJin Mincho Plane 3"
         }
     ]
 }

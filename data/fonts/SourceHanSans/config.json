@@ -1,0 +1,29 @@
+{
+    "id": "SourceHanSans",
+    "version": "2.005R",
+    "font_family": "Source Han Sans",
+    "name": {
+        "zh-hans": "思源黑体",
+        "zh-hant": "思源黑體"
+    },
+    "title": {
+        "zh-hans": "[[思源黑體|思源黑体]]",
+        "zh-hant": "[[思源黑體]]"
+    },
+    "license": "SIL Open Font License 1.1",
+    "fallback": [
+        "Plangothic"
+    ],
+    "files": [
+        {
+            "name": "Source Han Sans SC",
+            "path": "SourceHanSansSC.otf",
+            "font_family": "Source Han Sans SC"
+        },
+        {
+            "name": "Source Han Sans TC",
+            "path": "SourceHanSansTC.otf",
+            "font_family": "Source Han Sans TC"
+        }
+    ]
+}

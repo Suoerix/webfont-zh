@@ -23,7 +23,7 @@ GET /api/v1/list
 ```json
 [
   {
-    "id": "plangothic",
+    "id": "Plangothic",
     "version": "2.9.5787",
     "font_family": "Plangothic",
     "license": "SIL Open Font License 1.1",
@@ -45,7 +45,7 @@ GET /api/v1/list
     "font_family": "WenJinMincho",
     "license": "SIL Open Font License 1.1",
     "fallback": [
-      "plangothic"
+      "Plangothic"
     ],
     "name": {
       "zh-hans": "文津宋体",
@@ -96,8 +96,8 @@ GET /static/{font-id}/{cache-filename}
 ```css
 @font-face {
   font-family: "Plangothic-20013";
-  src: url("http://webfont-zh.toolforge.org/static/plangothic/20013.woff2") format("woff2"),
-       url("http://webfont-zh.toolforge.org/api/v1/font?id=plangothic&char=20013") format("woff2");
+  src: url("http://webfont-zh.toolforge.org/static/Plangothic/20013.woff2") format("woff2"),
+       url("http://webfont-zh.toolforge.org/api/v1/font?id=Plangothic&char=20013") format("woff2");
   unicode-range: U+4E2D;
 }
 

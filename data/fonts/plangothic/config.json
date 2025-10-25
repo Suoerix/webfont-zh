@@ -1,5 +1,5 @@
 {
-    "id": "plangothic",
+    "id": "Plangothic",
     "version": "2.9.5787",
     "font_family": "Plangothic",
     "name": {
@@ -11,6 +11,7 @@
         "zh-hant": "[[遍黑體]]"
     },
     "fallback": [
+        "SourceHanSans",
         "WenJinMincho"
     ],
     "license": "SIL Open Font License 1.1",

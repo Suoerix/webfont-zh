@@ -62,27 +62,34 @@ impl FontService {
         {
             let font_dir = entry.path();
             
-            if let Ok(font_config) = FontConfig::load_from_dir(&font_dir.to_path_buf()) {
-                log::info!("加载字体配置: {}", font_config.id);
-                
-                // 为每个字体文件创建处理器
-                for font_file in &font_config.files {
-                    let font_path = font_dir.join(&font_file.path);
-                    if font_path.exists() {
-                        match FontProcessor::new(&font_path) {
-                            Ok(processor) => {
-                                let key = format!("{}:{}", font_config.id, font_file.font_family);
-                                processors.insert(key, Arc::new(processor));
-                                log::info!("加载字体处理器: {} - {}", font_config.id, font_file.font_family);
+            match FontConfig::load_from_dir(&font_dir.to_path_buf()) {
+                Ok(font_config) => {
+                    log::info!("加载字体配置: {}", font_config.id);
+                    
+                    // 为每个字体文件创建处理器
+                    for font_file in &font_config.files {
+                        let font_path = font_dir.join(&font_file.path);
+                        if font_path.exists() {
+                            match FontProcessor::new(&font_path) {
+                                Ok(processor) => {
+                                    let key = format!("{}:{}", font_config.id, font_file.font_family);
+                                    processors.insert(key, Arc::new(processor));
+                                    log::info!("加载字体处理器: {} - {}", font_config.id, font_file.font_family);
+                                }
+                                Err(e) => {
+                                    log::error!("加载字体处理器失败 {}: {}", font_path.display(), e);
+                                }
                             }
-                            Err(e) => {
-                                log::error!("加载字体处理器失败 {}: {}", font_path.display(), e);
-                            }
+                        } else {
+                            log::error!("字体文件不存在: {}", font_path.display());
                         }
                     }
+                    
+                    fonts.insert(font_config.id.clone(), font_config);
                 }
-                
-                fonts.insert(font_config.id.clone(), font_config);
+                Err(e) => {
+                    log::error!("加载字体配置失败 {}: {}", font_dir.display(), e);
+                }
             }
         }
         
