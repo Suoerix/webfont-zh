@@ -2,7 +2,7 @@ use crate::{error::AppError, service::FontInfo, utils::parse_codepoints, AppStat
 use axum::{
     extract::{Query, State},
     http::{header, HeaderMap},
-    response::{IntoResponse, Response},
+    response::{Html, IntoResponse, Response},
     Json,
 };
 use serde::Deserialize;
@@ -74,4 +74,9 @@ pub async fn generate_font(
         "font_id": params.id,
         "characters": codepoints.len()
     })))
+}
+
+/// GET / - 主页
+pub async fn index() -> Html<&'static str> {
+    Html(include_str!("../index.html"))
 }

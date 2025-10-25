@@ -26,6 +26,7 @@ async fn main() -> anyhow::Result<()> {
     let font_service = Arc::new(FontService::new(config).await?);
     
     let app = Router::new()
+        .route("/", get(handlers::index))
         .route("/api/v1/list", get(handlers::list_fonts))
         .route("/api/v1/font", get(handlers::get_font))
         .route("/api/v1/generate", post(handlers::generate_font))

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebFont-ZH API 服务</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 12px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .section {
+            background: white;
+            margin: 20px 0;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .api-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .api-card {
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .api-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .method.get {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .method.post {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .endpoint {
+            font-family: 'Monaco', 'Menlo', monospace;
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+
+        .params {
+            margin: 10px 0;
+        }
+
+        .param {
+            background: #e8f4fd;
+            padding: 5px 8px;
+            margin: 2px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            display: inline-block;
+        }
+
+        .test-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px 5px 5px 0;
+            font-size: 0.9rem;
+        }
+
+        .test-btn:hover {
+            background: #2980b9;
+        }
+
+        .char-test {
+            font-size: 48px;
+            margin: 15px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px dashed #dee2e6;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .font-demo {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .webfont-demo {
+            background: #e8f5e8;
+            border: 2px solid #28a745;
+        }
+
+        .default-demo {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+        }
+
+        .info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
+        }
+
+        .code {
+            font-family: 'Monaco', 'Menlo', monospace;
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9rem;
+        }
+
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .status.loading {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+
+        .status.success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+
+        /* 使用webfont服务的字体 */
+        @font-face {
+            font-family: "Plangothic-20013";
+            src: url("https://webfont-zh.toolforge.org/static/Plangothic/20013.woff2") format("woff2"),
+                url("https://webfont-zh.toolforge.org/api/v1/font?id=Plangothic&char=20013") format("woff2");
+            unicode-range: U+4E2D;
+        }
+
+        @font-face {
+            font-family: "Plangothic-171907";
+            src: url("https://webfont-zh.toolforge.org/static/Plangothic/171907.woff2") format("woff2"),
+                url("https://webfont-zh.toolforge.org/api/v1/font?id=Plangothic&char=171907") format("woff2");
+            unicode-range: U+29F83;
+        }
+
+        .webfont-test {
+            font-family: "Plangothic-20013", "Plangothic-171907", serif;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .api-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔤 WebFont-ZH</h1>
+            <p>字体子集化分包服务</p>
+        </div>
+
+        <div class="section">
+            <h2>📋 API 接口</h2>
+            <div class="api-grid">
+                <div class="api-card">
+                    <h3><span class="method get">GET</span>获取字体列表</h3>
+                    <div class="endpoint">/api/v1/list</div>
+                    <p>返回所有可用字体的配置信息，包括字体ID、版本、许可证等。</p>
+                    <a href="https://webfont-zh.toolforge.org/api/v1/list" target="_blank" class="test-btn">测试接口</a>
+                </div>
+
+                <div class="api-card">
+                    <h3><span class="method get">GET</span>获取字体子集</h3>
+                    <div class="endpoint">/api/v1/font?id={font-id}&char={codepoints}</div>
+                    <div class="params">
+                        <span class="param">id: 字体ID (必需)</span>
+                        <span class="param">char: Unicode十进制码点，逗号分隔 (必需)</span>
+                    </div>
+                    <p>返回包含指定字符的WOFF2字体文件，自动缓存以提高性能。</p>
+                    <a href="https://webfont-zh.toolforge.org/api/v1/font?id=Plangothic&char=20013" target="_blank"
+                        class="test-btn">测试"中"字</a>
+                    <a href="https://webfont-zh.toolforge.org/api/v1/font?id=Plangothic&char=171907" target="_blank"
+                        class="test-btn">测试生僻字</a>
+                </div>
+
+                <div class="api-card">
+                    <h3><span class="method post">POST</span>重新生成字体</h3>
+                    <div class="endpoint">/api/v1/generate?id={font-id}&char={codepoints}</div>
+                    <div class="params">
+                        <span class="param">id: 字体ID (可选)</span>
+                        <span class="param">char: Unicode十进制码点 (必需)</span>
+                    </div>
+                    <p>强制刷新字体缓存文件，如果无缓存则直接生成字体文件。</p>
+                    <button onclick="testGenerate()" class="test-btn">测试生成</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🧪 字体对比测试</h2>
+            <div id="fontStatus" class="status loading">
+                <strong>状态：</strong>正在加载字体...
+            </div>
+
+            <div class="info">
+                <strong>测试说明：</strong>左侧使用WebFont-ZH服务加载的字体，右侧使用系统默认字体。
+                对比可以看出字体渲染效果的差异。
+            </div>
+
+            <h3>基本汉字测试</h3>
+            <div class="info">测试字符：中 (U+4E2D, 十进制: 20013)</div>
+            <div class="comparison">
+                <div class="font-demo webfont-demo">
+                    <h4>WebFont-ZH 字体</h4>
+                    <div class="char-test webfont-test">中</div>
+                </div>
+                <div class="font-demo default-demo">
+                    <h4>系统默认字体</h4>
+                    <div class="char-test">中</div>
+                </div>
+            </div>
+
+            <h3>生僻字测试</h3>
+            <div class="info">测试字符：𩾃 (U+29F83, 十进制: 171907) - 鱼字旁生僻字</div>
+            <div class="comparison">
+                <div class="font-demo webfont-demo">
+                    <h4>WebFont-ZH 字体</h4>
+                    <div class="char-test webfont-test">𩾃</div>
+                </div>
+                <div class="font-demo default-demo">
+                    <h4>系统默认字体</h4>
+                    <div class="char-test">𩾃</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📊 响应时间检测</h2>
+            <div id="performanceInfo">
+                <p>页面加载完成后将显示字体加载性能信息...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let fontLoadStartTime = performance.now();
+
+        // 测试POST接口
+        async function testGenerate() {
+            try {
+                const response = await fetch('/api/v1/generate?id=Plangothic&char=20013', {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                alert('生成成功: ' + JSON.stringify(result, null, 2));
+            } catch (error) {
+                alert('生成失败: ' + error.message);
+            }
+        }
+
+        // 检查字体加载状态
+        document.fonts.ready.then(function () {
+            const loadTime = performance.now() - fontLoadStartTime;
+            const statusEl = document.getElementById('fontStatus');
+
+            // 检查特定字体是否加载成功
+            const fonts = ['Plangothic-20013', 'Plangothic-171907'];
+            const loadedFonts = [];
+            const failedFonts = [];
+
+            fonts.forEach(fontFamily => {
+                if (document.fonts.check('48px ' + fontFamily)) {
+                    loadedFonts.push(fontFamily);
+                    console.log(`✅ 字体 ${fontFamily} 加载成功`);
+                } else {
+                    failedFonts.push(fontFamily);
+                    console.log(`❌ 字体 ${fontFamily} 加载失败`);
+                }
+            });
+
+            if (failedFonts.length === 0) {
+                statusEl.className = 'status success';
+                statusEl.innerHTML = `<strong>状态：</strong>所有字体加载成功！加载时间: ${loadTime.toFixed(2)}ms`;
+            } else {
+                statusEl.className = 'status error';
+                statusEl.innerHTML = `<strong>状态：</strong>部分字体加载失败: ${failedFonts.join(', ')}`;
+            }
+
+            // 更新性能信息
+            updatePerformanceInfo(loadTime, loadedFonts, failedFonts);
+        });
+
+        function updatePerformanceInfo(loadTime, loadedFonts, failedFonts) {
+            const perfEl = document.getElementById('performanceInfo');
+            const totalFonts = loadedFonts.length + failedFonts.length;
+
+            perfEl.innerHTML = `
+                <div class="info">
+                    <h4>字体加载统计</h4>
+                    <p><strong>总加载时间：</strong>${loadTime.toFixed(2)}ms</p>
+                    <p><strong>成功加载：</strong>${loadedFonts.length}/${totalFonts} 个字体</p>
+                    <p><strong>成功字体：</strong>${loadedFonts.join(', ') || '无'}</p>
+                    <p><strong>失败字体：</strong>${failedFonts.join(', ') || '无'}</p>
+                    <p><strong>页面加载时间：</strong>${(performance.now()).toFixed(2)}ms</p>
+                </div>
+            `;
+        }
+
+        // 监听字体加载事件
+        document.fonts.addEventListener('loadingdone', function (event) {
+            console.log('字体加载完成事件触发');
+            event.fontfaces.forEach(function (fontface) {
+                console.log('已加载字体:', fontface.family);
+            });
+        });
+
+        document.fonts.addEventListener('loadingerror', function (event) {
+            console.error('字体加载错误:', event);
+        });
+    </script>
+</body>
+
+</html>
