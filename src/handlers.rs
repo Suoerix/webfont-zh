@@ -7,12 +7,12 @@ use axum::{
 };
 use serde::Deserialize;
 
-
 #[derive(Deserialize)]
 pub struct FontQuery {
     pub id: String,
     #[serde(rename = "char")]
     pub chars: String,
+    pub v: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -30,25 +30,49 @@ pub async fn list_fonts(State(service): State<AppState>) -> Result<Json<Vec<Font
 
 /// GET /api/v1/font - 获取字体文件
 pub async fn get_font(
+    headers_in: HeaderMap,
     Query(params): Query<FontQuery>,
     State(service): State<AppState>,
 ) -> Result<Response, AppError> {
     let codepoints = parse_codepoints(&params.chars)
         .map_err(|_| AppError::ConfigError("无效的字符码点格式".to_string()))?;
-    
+
     if codepoints.is_empty() {
         return Err(AppError::ConfigError("字符码点不能为空".to_string()));
     }
-    
+
     let woff2_data = service.get_cached_font(&params.id, &codepoints).await?;
-    
+
+    // 计算 ETag
+    let digest = md5::compute(&woff2_data);
+    let etag = format!("\"{:x}\"", digest);
+
+    // 检查 If-None-Match
+    if let Some(if_none_match) = headers_in.get(header::IF_NONE_MATCH) {
+        if let Ok(if_none_match_str) = if_none_match.to_str() {
+            if if_none_match_str == etag {
+                return Ok(
+                    ([(header::ETAG, etag)], axum::http::StatusCode::NOT_MODIFIED).into_response(),
+                );
+            }
+        }
+    }
+
     let mut headers = HeaderMap::new();
-    headers.insert(header::CONTENT_TYPE, "application/font-woff2".parse().unwrap());
     headers.insert(
-        header::CACHE_CONTROL,
-        "public, max-age=31536000, immutable".parse().unwrap(),
+        header::CONTENT_TYPE,
+        "application/font-woff2".parse().unwrap(),
     );
-    
+    headers.insert(header::ETAG, etag.parse().unwrap());
+
+    let cache_control = if params.v.is_some() {
+        "public, max-age=31536000, immutable"
+    } else {
+        "public, max-age=7776000" // 3 months
+    };
+
+    headers.insert(header::CACHE_CONTROL, cache_control.parse().unwrap());
+
     Ok((headers, woff2_data).into_response())
 }
 
@@ -59,15 +83,15 @@ pub async fn generate_font(
 ) -> Result<Json<serde_json::Value>, AppError> {
     let codepoints = parse_codepoints(&params.chars)
         .map_err(|_| AppError::ConfigError("无效的字符码点格式".to_string()))?;
-    
+
     if codepoints.is_empty() {
         return Err(AppError::ConfigError("字符码点不能为空".to_string()));
     }
-    
+
     service
         .regenerate_font(params.id.as_deref(), &codepoints)
         .await?;
-    
+
     Ok(Json(serde_json::json!({
         "success": true,
         "message": "字体文件已重新生成",
