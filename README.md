@@ -62,15 +62,16 @@ GET /api/v1/list
 ### 2. Retrieve Font Subset
 
 ```http
-GET /api/v1/font?id={font-id}&char={unicode-codepoints}
+GET /api/v1/font?id={font-id}&char={unicode-codepoints}&v={font-version}
 ```
 **Parameters**:
 - `id`: Font ID (required)
 - `char`: Unicode decimal codepoints, separated by commas (required)
+- `v`: Font version (optional)
 
 **Response**:
 - Content-Type: `application/font-woff2`
-- Cache-Control: `public, max-age=31536000, immutable`
+- Cache-Control: `public, max-age=31536000, immutable` (with font version) or `public, max-age=7776000` (without font version)
 
 ### 3. Regenerate Font Cache
 
