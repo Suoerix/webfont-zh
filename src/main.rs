@@ -21,10 +21,10 @@ pub type AppState = Arc<FontService>;
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     env_logger::init();
-    
+
     let config = AppConfig::load()?;
     let font_service = Arc::new(FontService::new(config).await?);
-    
+
     let app = Router::new()
         .route("/", get(handlers::index))
         .route("/api/v1/list", get(handlers::list_fonts))
@@ -40,9 +40,9 @@ async fn main() -> anyhow::Result<()> {
         .unwrap_or(8000);
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
     log::info!("服务器启动在 {}", addr);
-    
+
     let listener = tokio::net::TcpListener::bind(addr).await?;
     axum::serve(listener, app).await?;
-    
+
     Ok(())
 }

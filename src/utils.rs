@@ -12,7 +12,7 @@ pub fn parse_codepoints(chars_str: &str) -> Result<Vec<u32>, std::num::ParseIntE
 pub fn generate_cache_filename(codepoints: &[u32]) -> String {
     let mut sorted_codepoints = codepoints.to_vec();
     sorted_codepoints.sort_unstable();
-    
+
     if sorted_codepoints.len() == 1 {
         format!("{}.woff2", sorted_codepoints[0])
     } else {
@@ -45,12 +45,12 @@ pub fn is_file_expired(file_path: &Path, days: u64) -> bool {
 /// 清理过期的缓存文件
 pub fn cleanup_expired_cache(cache_dir: &Path, days: u64) -> std::io::Result<usize> {
     let mut cleaned_count = 0;
-    
+
     if cache_dir.exists() {
         for entry in std::fs::read_dir(cache_dir)? {
             let entry = entry?;
             let path = entry.path();
-            
+
             if path.is_file() && is_file_expired(&path, days) {
                 if std::fs::remove_file(&path).is_ok() {
                     cleaned_count += 1;
@@ -59,7 +59,7 @@ pub fn cleanup_expired_cache(cache_dir: &Path, days: u64) -> std::io::Result<usi
             }
         }
     }
-    
+
     Ok(cleaned_count)
 }
 
@@ -70,13 +70,22 @@ mod tests {
     #[test]
     fn test_parse_codepoints() {
         assert_eq!(parse_codepoints("40339").unwrap(), vec![40339]);
-        assert_eq!(parse_codepoints("40339,40340,40341").unwrap(), vec![40339, 40340, 40341]);
-        assert_eq!(parse_codepoints("40339, 40340, 40341").unwrap(), vec![40339, 40340, 40341]);
+        assert_eq!(
+            parse_codepoints("40339,40340,40341").unwrap(),
+            vec![40339, 40340, 40341]
+        );
+        assert_eq!(
+            parse_codepoints("40339, 40340, 40341").unwrap(),
+            vec![40339, 40340, 40341]
+        );
     }
 
     #[test]
     fn test_generate_cache_filename() {
         assert_eq!(generate_cache_filename(&[40339]), "40339.woff2");
-        assert_eq!(generate_cache_filename(&[40341, 40339, 40340]), "cache/40339,40340,40341.woff2");
+        assert_eq!(
+            generate_cache_filename(&[40341, 40339, 40340]),
+            "cache/40339,40340,40341.woff2"
+        );
     }
 }

@@ -22,12 +22,12 @@ impl Default for AppConfig {
 impl AppConfig {
     pub fn load() -> Result<Self> {
         let config = Self::default();
-        
+
         // 确保目录存在
         std::fs::create_dir_all(&config.data_dir)?;
         std::fs::create_dir_all(&config.static_dir)?;
         std::fs::create_dir_all(config.data_dir.join("fonts"))?;
-        
+
         Ok(config)
     }
 }
@@ -68,7 +68,7 @@ impl FontConfig {
         let config: FontConfig = serde_json::from_str(&content)?;
         Ok(config)
     }
-    
+
     pub fn save_to_dir(&self, font_dir: &PathBuf) -> Result<()> {
         let config_path = font_dir.join("config.json");
         let content = serde_json::to_string_pretty(self)?;
