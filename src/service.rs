@@ -117,27 +117,51 @@ impl FontService {
     /// 生成字体WOFF2文件
     pub async fn generate_font(&self, font_id: Option<&str>, codepoints: &[u32]) -> Result<Vec<u8>, AppError> {
         if codepoints.is_empty() {
-            return Err(AppError::CharacterNotFound(0));
+            return Err(AppError::ConfigError("字符码点不能为空".to_string()));
         }
         
         // 如果指定了字体ID，直接使用该字体
         if let Some(id) = font_id {
-            return self.generate_font_by_id(id, codepoints).await;
+            let mut visited = std::collections::HashSet::new();
+            return self.generate_font_by_id_internal(id, codepoints, &mut visited).await;
         }
         
         // 否则尝试所有字体，使用第一个包含字符的字体
         let fonts = self.fonts.read().await;
-        for font_config in fonts.values() {
-            if let Ok(woff2_data) = self.generate_font_by_id(&font_config.id, codepoints).await {
+        let font_ids: Vec<String> = fonts.keys().cloned().collect();
+        drop(fonts); // 释放读锁
+        
+        for font_id in &font_ids {
+            let mut visited = std::collections::HashSet::new();
+            if let Ok(woff2_data) = self.generate_font_by_id_internal(font_id, codepoints, &mut visited).await {
+                log::debug!("使用字体 {} 生成字符", font_id);
                 return Ok(woff2_data);
             }
         }
         
+        // 记录详细的错误信息
+        let char_list: Vec<String> = codepoints.iter()
+            .filter_map(|&cp| char::from_u32(cp).map(|c| format!("U+{:04X} ({})", cp, c)))
+            .collect();
+        log::error!("所有字体都不包含请求的字符: {}", char_list.join(", "));
+        
         Err(AppError::CharacterNotFound(codepoints[0]))
     }
     
-    /// 根据字体ID生成WOFF2文件
-    async fn generate_font_by_id(&self, font_id: &str, codepoints: &[u32]) -> Result<Vec<u8>, AppError> {
+    /// 根据字体ID生成WOFF2文件（内部方法，带循环检测）
+    async fn generate_font_by_id_internal(
+        &self, 
+        font_id: &str, 
+        codepoints: &[u32],
+        visited: &mut std::collections::HashSet<String>
+    ) -> Result<Vec<u8>, AppError> {
+        // 检测循环引用
+        if visited.contains(font_id) {
+            log::warn!("检测到字体fallback循环引用: {}", font_id);
+            return Err(AppError::CharacterNotFound(codepoints[0]));
+        }
+        visited.insert(font_id.to_string());
+        
         let fonts = self.fonts.read().await;
         let font_config = fonts
             .get(font_id)
@@ -151,7 +175,10 @@ impl FontService {
                 let available_chars = processor.get_available_chars(codepoints);
                 if !available_chars.is_empty() {
                     match processor.generate_woff2(&available_chars) {
-                        Ok(woff2_data) => return Ok(woff2_data),
+                        Ok(woff2_data) => {
+                            log::debug!("成功生成字体 {} 包含 {} 个字符", key, available_chars.len());
+                            return Ok(woff2_data);
+                        },
                         Err(e) => log::warn!("生成WOFF2失败 {}: {}", key, e),
                     }
                 }
@@ -159,12 +186,23 @@ impl FontService {
         }
         
         // 如果当前字体不包含字符，尝试fallback字体
-        for fallback_id in &font_config.fallback {
-            let fallback_result = Box::pin(self.generate_font_by_id(fallback_id, codepoints)).await;
+        let fallback_ids = font_config.fallback.clone();
+        drop(fonts); // 释放读锁
+        drop(processors); // 释放读锁
+        
+        for fallback_id in &fallback_ids {
+            log::debug!("尝试fallback字体: {} -> {}", font_id, fallback_id);
+            let fallback_result = Box::pin(self.generate_font_by_id_internal(fallback_id, codepoints, visited)).await;
             if let Ok(woff2_data) = fallback_result {
                 return Ok(woff2_data);
             }
         }
+        
+        // 记录详细的错误信息
+        let char_list: Vec<String> = codepoints.iter()
+            .filter_map(|&cp| char::from_u32(cp).map(|c| format!("U+{:04X} ({})", cp, c)))
+            .collect();
+        log::debug!("字体 {} 及其fallback都不包含请求的字符: {}", font_id, char_list.join(", "));
         
         Err(AppError::CharacterNotFound(codepoints[0]))
     }

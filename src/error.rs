@@ -32,18 +32,52 @@ pub enum AppError {
 
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
-        let (status, error_message) = match self {
-            AppError::FontNotFound(_) => (StatusCode::NOT_FOUND, self.to_string()),
-            AppError::CharacterNotFound(_) => (StatusCode::NOT_FOUND, self.to_string()),
-            AppError::ConfigError(_) => (StatusCode::INTERNAL_SERVER_ERROR, self.to_string()),
-            AppError::FontProcessingError(_) => (StatusCode::INTERNAL_SERVER_ERROR, self.to_string()),
-            AppError::IoError(_) => (StatusCode::INTERNAL_SERVER_ERROR, "文件系统错误".to_string()),
-            AppError::SerdeError(_) => (StatusCode::BAD_REQUEST, "请求格式错误".to_string()),
-            AppError::InternalError(_) => (StatusCode::INTERNAL_SERVER_ERROR, "内部服务器错误".to_string()),
+        let (status, error_message, error_code) = match &self {
+            AppError::FontNotFound(font_id) => (
+                StatusCode::NOT_FOUND, 
+                format!("字体未找到: {}", font_id),
+                "FONT_NOT_FOUND"
+            ),
+            AppError::CharacterNotFound(codepoint) => {
+                let char_info = char::from_u32(*codepoint)
+                    .map(|c| format!("U+{:04X} ({})", codepoint, c))
+                    .unwrap_or_else(|| format!("U+{:04X}", codepoint));
+                (
+                    StatusCode::NOT_FOUND,
+                    format!("所有字体都不包含请求的字符: {}", char_info),
+                    "CHARACTER_NOT_FOUND"
+                )
+            },
+            AppError::ConfigError(_) => (
+                StatusCode::BAD_REQUEST, 
+                self.to_string(),
+                "CONFIG_ERROR"
+            ),
+            AppError::FontProcessingError(_) => (
+                StatusCode::INTERNAL_SERVER_ERROR, 
+                self.to_string(),
+                "FONT_PROCESSING_ERROR"
+            ),
+            AppError::IoError(_) => (
+                StatusCode::INTERNAL_SERVER_ERROR, 
+                "文件系统错误".to_string(),
+                "IO_ERROR"
+            ),
+            AppError::SerdeError(_) => (
+                StatusCode::BAD_REQUEST, 
+                "请求格式错误".to_string(),
+                "SERDE_ERROR"
+            ),
+            AppError::InternalError(_) => (
+                StatusCode::INTERNAL_SERVER_ERROR, 
+                "内部服务器错误".to_string(),
+                "INTERNAL_ERROR"
+            ),
         };
 
         let body = Json(json!({
-            "error": error_message
+            "error": error_message,
+            "code": error_code
         }));
 
         (status, body).into_response()
